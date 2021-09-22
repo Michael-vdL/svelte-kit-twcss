@@ -51,8 +51,12 @@
       diff: diff,
     })
     width.set({
-      text: `A${e.target.id}A`,
+      text: `\s${e.target.id}\s`,
     })
+  }
+
+  const toggleShow = () => {
+    visible = !visible
   }
 </script>
 
@@ -60,8 +64,8 @@
   <div
     id="hacked-hover"
     class="bg-gray-400 opacity-40 rounded-md absolute h-8 top-2 z-0 bg-blend-lighten text-transparent"
-    transition:fade={{ duration: 2000 }}
-    style="transform: translateX({$hoverBox.x + 10}px)"
+    transition:fade={{ duration: 100 }}
+    style="transform: translateX({$hoverBox.x + 13}px)"
   >
     {$width.text}
   </div>
@@ -71,9 +75,8 @@
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <div
   class="fixed flex flex-row justify-center w-full"
-  on:mouseout={() => {
-    !visible
-  }}
+  on:mouseenter={toggleShow}
+  on:mouseleave={toggleShow}
 >
   {#each items as item}
     <a
@@ -81,20 +84,14 @@
       key={item}
       id={item}
       class="py-3 px-5 text-md font-bold tracking-tighter z-20"
-      on:mouseenter={(e) => identifyTarget(e)}
+      on:mouseenter={(e) => {
+        identifyTarget(e)
+      }}
+      on:mouseleave={() => {
+        !visible
+      }}
     >
       {item}
     </a>
   {/each}
-  <!-- <svg class="absolute w-full h-full">
-    <rect
-      class="fill-current text-gray-400 opacity-25 bg-blend-lighten"
-      x={$hoverBox.x}
-      y={8}
-      width={$hoverBox.w}
-      height={32}
-      rx={10}
-    />
-  </svg> -->
 </div>
-<!-- on:mousemove={(e) => hoverBox.set({ x: e.clientX, y: e.clientY })} -->
