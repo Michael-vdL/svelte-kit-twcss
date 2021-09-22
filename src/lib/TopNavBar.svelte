@@ -15,13 +15,15 @@
   import { onMount } from 'svelte'
   import { writable } from 'svelte/store'
   import { fly, fade } from 'svelte/transition'
+  import { spring } from 'svelte/motion'
   import { quintOut } from 'svelte/easing'
 
   let current
   let target
-  let hoverBox = writable({ x: 0, text: '', diff: 0 })
+  let hoverBox = spring({ x: 0, diff: 0 })
+  let width = writable({ text: '' })
 
-  let needsUpdate = false
+  let visible = false
 
   const items = [
     'Model S',
@@ -42,45 +44,47 @@
       diff = target.x - current.x
       current = target
     }
+    visible = true
     // console.log(current)
     hoverBox.set({
       x: current.x,
       diff: diff,
+    })
+    width.set({
       text: `A${e.target.id}A`,
     })
-    needsUpdate = true
-    // hoverBox.set({
-    //   // x: cur,
-    // })
   }
 </script>
 
-{#if needsUpdate}
+{#if visible}
   <div
     id="hacked-hover"
-    class="bg-gray-400 opacity-40 rounded-md absolute h-8 top-2 z-0 bg-blend-lighten text-transparent transform"
-    in:fly={{ x: -$hoverBox.diff, duration: 300 }}
-    out:fade={{ duration: 10000 }}
+    class="bg-gray-400 opacity-40 rounded-md absolute h-8 top-2 z-0 bg-blend-lighten text-transparent"
+    transition:fade={{ duration: 2000 }}
     style="transform: translateX({$hoverBox.x + 10}px)"
   >
-    {$hoverBox.text}
+    {$width.text}
   </div>
 {/if}
 
 <!-- style="transform: " -->
-<div class="fixed flex flex-row justify-center w-full">
+<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+<div
+  class="fixed flex flex-row justify-center w-full"
+  on:mouseout={() => {
+    !visible
+  }}
+>
   {#each items as item}
-    <div
+    <a
+      href="/lol"
       key={item}
       id={item}
       class="py-3 px-5 text-md font-bold tracking-tighter z-20"
       on:mouseenter={(e) => identifyTarget(e)}
-      on:mouseleave={() => {
-        needsUpdate = false
-      }}
     >
       {item}
-    </div>
+    </a>
   {/each}
   <!-- <svg class="absolute w-full h-full">
     <rect
